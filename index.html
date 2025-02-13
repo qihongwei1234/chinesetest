@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉字识字测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form div {
+            margin-bottom: 15px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>汉字识字能力测试</h1>
+    <form id="testForm">
+        <div id="questions"></div>
+        <button type="button" onclick="submitTest()">提交</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        // 汉字数据
+        const characterData = {
+            "categories": [
+                {"name": "数字与时间类", "characters": ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]},
+                {"name": "家庭与人物类", "characters": ["爸", "妈", "哥", "姐", "弟", "妹"]},
+                {"name": "物品类", "characters": ["门", "窗", "桌", "椅", "床", "灯"]},
+                {"name": "动作类", "characters": ["走", "跑", "跳", "吃", "喝", "看"]},
+                {"name": "自然现象类", "characters": ["天", "地", "日", "月", "星", "云"]}
+            ]
+        };
+
+        // 随机生成测试问题
+        function generateQuestions() {
+            const questionsDiv = document.getElementById('questions');
+            let questionsHTML = '';
+            characterData.categories.forEach(category => {
+                const selectedChars = category.characters.sort(() => Math.random() - 0.5).slice(0, 3); // 随机选择字符
+                selectedChars.forEach(char => {
+                    questionsHTML += `
+                        <div>
+                            <p>你认识这个字吗？（${char}）</p>
+                            <label><input type="radio" name="q_${char}" value="认识"> 认识</label>
+                            <label><input type="radio" name="q_${char}" value="不认识"> 不认识</label>
+                        </div>
+                        <div>
+                            <p>请写出这个字：“${char}”。</p>
+                            <input type="text" name="write_${char}">
+                        </div>
+                    `;
+                });
+            });
+            questionsDiv.innerHTML = questionsHTML;
+        }
+
+        // 提交表单并计算得分
+        function submitTest() {
+            let score = 0;
+            let total = 0;
+            const form = document.getElementById('testForm');
+            Array.from(form.elements).forEach(element => {
+                if (element.type === 'radio' && element.checked) {
+                    total++;
+                    if (element.value === '认识') score++;
+                } else if (element.type === 'text') {
+                    total++;
+                    const correctAnswer = element.name.split('_')[1];
+                    if (element.value === correctAnswer) score++;
+                }
+            });
+            document.getElementById('result').innerText = `测试完成！你的得分是：${score}/${total}`;
+        }
+
+        // 初始化页面
+        window.onload = generateQuestions;
+    </script>
+</body>
+</html>
